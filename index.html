@@ -7,14 +7,14 @@
 <style>
 /* RESET */
 * { margin:0; padding:0; box-sizing:border-box; font-family: Arial, sans-serif; }
-body {background:#1c1c1c; color:#e0e0e0; overflow-x:hidden; display:flex; flex-direction:column; min-height:100vh;}
+body {background:#1c1c1c; color:#e0e0e0; overflow-x:hidden; display:flex; flex-direction:column; min-height:100vh; font-size:18px;}
 
 /* HEADER */
 header {
   background:#2a2a2a; 
-  padding:15px; 
+  padding:20px; 
   text-align:center; 
-  font-size:22px; 
+  font-size:28px; 
   position:relative; 
   display:flex; 
   align-items:center; 
@@ -24,8 +24,8 @@ header {
   position:absolute;
   left:15px; 
   top:15px; 
-  width:40px; 
-  height:40px; 
+  width:50px; 
+  height:50px; 
   cursor:pointer; 
   border-radius:50%; 
   background:#333; 
@@ -33,7 +33,7 @@ header {
   align-items:center; 
   justify-content:center;
   font-weight:bold;
-  font-size:16px;
+  font-size:20px;
   transition: all 0.3s;
 }
 #logoBtn:hover{
@@ -54,9 +54,9 @@ header {
   padding-top:60px;
   box-shadow:2px 0 10px #111;
 }
-#sidebar h2{color:#e0e0e0;text-align:center;margin-bottom:20px;}
+#sidebar h2{color:#e0e0e0;text-align:center;margin-bottom:20px; font-size:24px;}
 #sidebar ul{list-style:none;padding:0 15px;}
-#sidebar li{margin-bottom:10px;padding:8px;background:#333;border-radius:6px;cursor:pointer;color:#e0e0e0;transition:0.3s;}
+#sidebar li{margin-bottom:12px;padding:10px;background:#333;border-radius:6px;cursor:pointer;color:#e0e0e0;transition:0.3s; font-size:18px;}
 #sidebar li:hover{background:#444;}
 #closeSidebar {
   position:absolute;
@@ -65,10 +65,11 @@ header {
   background:#333;
   color:#e0e0e0;
   border:none;
-  padding:5px 10px;
+  padding:6px 12px;
   cursor:pointer;
   border-radius:6px;
   transition:0.3s;
+  font-size:16px;
 }
 #closeSidebar:hover{background:#444; transform: scale(1.05);}
 
@@ -77,18 +78,19 @@ header {
   flex:1;
   height:60vh;
   overflow-y:auto;
-  padding:15px;
+  padding:20px;
   background:#2a2a2a;
   margin-left:0;
   transition:margin-left 0.4s;
 }
 .message{
-  padding:10px 14px;
-  margin:10px 0;
+  padding:14px 18px;
+  margin:12px 0;
   max-width:75%;
-  border-radius:12px;
+  border-radius:14px;
   word-wrap:break-word;
   background:#333;
+  font-size:18px;
 }
 .user{margin-left:auto;}
 .ai{margin-right:auto;}
@@ -97,37 +99,38 @@ header {
 .codeBlock{
   background:#333;
   color:#e0e0e0;
-  padding:10px;
+  padding:12px;
   border-radius:8px;
   font-family:monospace;
   position:relative;
+  font-size:16px;
 }
 .codeButtons{
   position:absolute;top:5px;right:5px;
 }
 .codeButtons button{
-  margin-left:5px;padding:3px 6px;font-size:12px;border:none;border-radius:4px;cursor:pointer;background:#444;color:#e0e0e0;
+  margin-left:5px;padding:4px 8px;font-size:14px;border:none;border-radius:4px;cursor:pointer;background:#444;color:#e0e0e0;
 }
 
 /* INPUT AREA */
 .bottom{
   display:flex;
-  padding:10px;
+  padding:12px;
   background:#2a2a2a;
   position:fixed;
   bottom:0;
   width:100%;
 }
-#userInput{flex:1;padding:15px;border-radius:25px;border:none;background:#333;color:#e0e0e0;}
+#userInput{flex:1;padding:18px;border-radius:25px;border:none;background:#333;color:#e0e0e0; font-size:18px;}
 #sendBtn{
-  width:50px;
-  height:50px;
+  width:55px;
+  height:55px;
   margin-left:10px;
   border-radius:50%;
   border:none;
   background:#333;
   color:#e0e0e0;
-  font-size:22px;
+  font-size:24px;
   cursor:pointer;
   transition: transform 0.3s, box-shadow 0.3s;
 }
@@ -139,14 +142,14 @@ header {
 /* VOICE BUTTON */
 #assistantBtn{
   position:fixed;
-  bottom:80px;
+  bottom:90px;
   right:20px;
-  width:60px;
-  height:60px;
+  width:65px;
+  height:65px;
   border-radius:50%;
   background:#333;
   color:#e0e0e0;
-  font-size:28px;
+  font-size:32px;
   cursor:pointer;
   display:flex;
   align-items:center;
