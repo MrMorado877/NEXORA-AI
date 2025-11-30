@@ -1,7 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <!-- Google Analytics -->
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Assistant Chat</title>
+
+<!-- SEO Meta Tags -->
+<meta name="description" content="AI Assistant ChatGPT style website. Ask questions, generate code, and interact with AI.">
+<meta name="keywords" content="AI, ChatGPT, AI assistant, code generator, chatbot, AI website">
+<meta name="author" content="Your Name">
+<meta name="robots" content="index, follow">
+
+<!-- Google Analytics (replace YOUR_TRACKING_ID with your ID) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=YOUR_TRACKING_ID"></script>
 <script>
 window.dataLayer = window.dataLayer || [];
@@ -10,9 +20,6 @@ gtag('js', new Date());
 gtag('config', 'YOUR_TRACKING_ID');
 </script>
 
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AI Assistant Chat</title>
 <style>
 /* RESET */
 * { margin:0; padding:0; box-sizing:border-box; font-family: Arial, sans-serif; }
@@ -148,7 +155,7 @@ header {
   box-shadow: 0 0 15px #555;
 }
 
-/* VOICE BUTTON */
+/* VOICE BUTTON (optional, you can remove) */
 #assistantBtn{
   position:fixed;
   bottom:90px;
@@ -189,10 +196,11 @@ header {
   <button id="sendBtn">⬆</button>
 </div>
 
+<!-- Optional voice input (can remove if not needed) -->
 <div id="assistantBtn" title="Voice Input">🎤</div>
 
 <script>
-const BACKEND = "http://localhost:5000";
+const BACKEND = "http://localhost:5000"; // Your backend endpoint
 let chatHistory = [];
 
 // Sidebar toggle
@@ -272,14 +280,12 @@ async function sendChat(){
 
     addMessage(reply,"ai",isCode);
 
-  // No voice output anymore
-// if(isCode){ speak(reply); } → removed
-
+    // Voice output removed for all messages
     chatHistory.push({type:"ai",text:reply});
   }catch(e){console.error(e);}
 }
 
-// Voice input
+// Optional: Voice input (can remove if not needed)
 document.getElementById("assistantBtn").onclick=()=>{
   const recognition=new (window.SpeechRecognition||window.webkitSpeechRecognition)();
   recognition.lang="en-US";
@@ -291,18 +297,9 @@ document.getElementById("assistantBtn").onclick=()=>{
   };
 };
 
-// Voice output
-function speak(text){
-  const utter=new SpeechSynthesisUtterance(text);
-  utter.lang="en-US";
-  speechSynthesis.speak(utter);
-}
-
 // Send button & Enter key
 document.getElementById("sendBtn").onclick=sendChat;
 document.getElementById("userInput").addEventListener("keypress",e=>{if(e.key==="Enter") sendChat();});
 </script>
 </body>
 </html>
-
-
