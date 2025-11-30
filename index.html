@@ -1,170 +1,425 @@
 <!DOCTYPE html>
-<html lang="hi">
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Adam AI Assistant</title>
-
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Adam — AI Assistant (Static Demo)</title>
+<meta name="description" content="Adam AI Assistant — ChatGPT-style UI. Type questions, get responses, copy/edit code blocks, save history.">
+<meta name="robots" content="index, follow">
   <meta name="google-site-verification" content="qLKwdVfAn0qgmnyOxefdD3EfWTbYMth60QPmLUJcww4" />
 
-<meta name="description" content="Adam AI Assistant ChatGPT style website. Type and interact with AI.">
-<meta name="keywords" content="AI, ChatGPT, AI assistant, code generator, chatbot, Adam AI">
-<meta name="author" content="Your Name">
-<meta name="robots" content="index, follow">
-
 <style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif;}
-body{background:#1c1c1c;color:#e0e0e0;display:flex;flex-direction:column;min-height:100vh;font-size:18px;}
-
-/* HEADER */
-header{background:#2a2a2a;padding:20px;text-align:center;font-size:28px;position:relative;display:flex;align-items:center;justify-content:center;}
-#logoBtn{position:absolute;left:15px;top:15px;width:50px;height:50px;cursor:pointer;border-radius:50%;background:#333;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:20px;transition:all 0.3s;}
-#logoBtn:hover{background:#444;transform:scale(1.1) rotate(15deg);}
-
-/* SIDEBAR */
-#sidebar{height:100%;width:0;position:fixed;top:0;left:0;background:#2a2a2a;overflow-x:hidden;transition:0.4s;padding-top:60px;box-shadow:2px 0 10px #111;}
-#sidebar h2{color:#e0e0e0;text-align:center;margin-bottom:20px;font-size:24px;}
-#sidebar ul{list-style:none;padding:0 15px;}
-#sidebar li{margin-bottom:12px;padding:10px;background:#333;border-radius:6px;cursor:pointer;color:#e0e0e0;transition:0.3s;font-size:18px;}
-#sidebar li:hover{background:#444;}
-#closeSidebar{position:absolute;top:15px;right:15px;background:#333;color:#e0e0e0;border:none;padding:6px 12px;cursor:pointer;border-radius:6px;transition:0.3s;font-size:16px;}
-#closeSidebar:hover{background:#444;transform:scale(1.05);}
-
-/* CHAT BOX */
-#chatBox{flex:1;height:60vh;overflow-y:auto;padding:20px;background:#2a2a2a;margin-left:0;transition:margin-left 0.4s;}
-.message{padding:14px 18px;margin:12px 0;max-width:75%;border-radius:14px;word-wrap:break-word;background:#333;font-size:18px;white-space: pre-wrap;}
-.user{margin-left:auto;}
-.ai{margin-right:auto;}
-
-/* Loading animation */
-.loading{display:flex;justify-content:flex-start;margin:0 5px;}
-.loading span{width:10px;height:10px;background:#0ff;border-radius:50%;display:inline-block;margin:0 3px;animation:blink 1.2s infinite;}
-.loading span:nth-child(2){animation-delay:0.2s;}
-.loading span:nth-child(3){animation-delay:0.4s;}
-@keyframes blink{0%,80%,100%{opacity:0.3;}40%{opacity:1;}}
-
-/* CODE BLOCK */
-.codeBlock{background:#333;color:#e0e0e0;padding:12px;border-radius:8px;font-family:monospace;position:relative;font-size:16px;}
-.codeButtons{position:absolute;top:5px;right:5px;}
-.codeButtons button{margin-left:5px;padding:4px 8px;font-size:14px;border:none;border-radius:4px;cursor:pointer;background:#444;color:#e0e0e0;}
-
-/* INPUT AREA */
-.bottom{display:flex;padding:12px;background:#2a2a2a;position:fixed;bottom:0;width:100%;align-items:center;}
-#userInput{flex:1;padding:18px;border-radius:25px;border:none;background:#333;color:#e0e0e0;font-size:18px;}
-#sendBtn{width:55px;height:55px;margin-left:10px;border-radius:50%;border:none;background:#333;color:#e0e0e0;font-size:24px;cursor:pointer;transition: transform 0.3s, box-shadow 0.3s;}
-#sendBtn:hover{transform:scale(1.2);box-shadow:0 0 15px #555;}
-</style>
-</head>
-<body>
-
-<header>
-  <div id="logoBtn" title="Chat History">💻</div>
-  What are you going to make today?
-</header>
-
-<div id="sidebar">
-  <button id="closeSidebar">Close</button>
-  <h2>Chat History</h2>
-  <ul id="historyList"></ul>
-</div>
-
-<div id="chatBox"></div>
-
-<div class="bottom">
-  <input id="userInput" placeholder="What are you going to make today?">
-  <button id="sendBtn">⬆</button>
-</div>
-
-<script>
-const BACKEND = "http://localhost:5000"; // Your backend URL
-let chatHistory = [];
-
-// Sidebar toggle
-const sidebar=document.getElementById("sidebar");
-const chatBox=document.getElementById("chatBox");
-const logoBtn=document.getElementById("logoBtn");
-const closeSidebar=document.getElementById("closeSidebar");
-logoBtn.onclick=()=>{sidebar.style.width="250px";chatBox.style.marginLeft="250px";};
-closeSidebar.onclick=()=>{sidebar.style.width="0";chatBox.style.marginLeft="0";};
-
-// Add message
-function addMessage(text,type,isCode=false){
-  const div=document.createElement("div");
-  div.className=`message ${type}`;
-
-  if(isCode || text.includes("```")){
-    const codeContent=text.replace(/```/g,"");
-    const codeDiv=document.createElement("div");
-    codeDiv.className="codeBlock";
-    codeDiv.innerText=codeContent;
-
-    const btnDiv=document.createElement("div");
-    btnDiv.className="codeButtons";
-    const copyBtn=document.createElement("button"); copyBtn.innerText="Copy";
-    copyBtn.onclick=()=>{navigator.clipboard.writeText(codeContent);}
-    const editBtn=document.createElement("button"); editBtn.innerText="Edit";
-    editBtn.onclick=()=>{document.getElementById("userInput").value=codeContent; document.getElementById("userInput").focus();}
-    btnDiv.appendChild(copyBtn); btnDiv.appendChild(editBtn); codeDiv.appendChild(btnDiv);
-    div.appendChild(codeDiv);
-  } else {
-    // Loading animation
-    const loadingDiv=document.createElement("div");
-    loadingDiv.className="loading";
-    for(let i=0;i<3;i++){ const dot=document.createElement("span"); loadingDiv.appendChild(dot); }
-    div.appendChild(loadingDiv);
-    chatBox.appendChild(div);
-    chatBox.scrollTop = chatBox.scrollHeight;
-
-    // After delay, show typed text
-    setTimeout(()=>{
-      div.removeChild(loadingDiv);
-      const span=document.createElement("span"); div.appendChild(span);
-      let i = 0;
-      const interval = setInterval(()=>{
-        span.innerText += text.charAt(i); // Preserve spaces
-        i++;
-        if(i>=text.length){ clearInterval(interval); }
-      },30);
-    },800);
+  :root{
+    --bg:#0f1114; --panel:#131516; --muted:#9aa4ad; --accent:#0a84ff; --bubble:#1b1d1f; --user:#26292b;
+    --glass: rgba(255,255,255,0.03);
+  }
+  [data-theme="light"]{
+    --bg:#f6f7f9; --panel:#ffffff; --muted:#6b7280; --accent:#006fe0; --bubble:#f1f3f5; --user:#e6e9ec; --glass: rgba(0,0,0,0.03);
   }
 
-  chatBox.appendChild(div);
-  chatBox.scrollTop=chatBox.scrollHeight;
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0;font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; background:var(--bg); color: #e6eef3; -webkit-font-smoothing:antialiased;}
+  [data-theme="light"] body{color:#0b1220}
 
-  // Add to history sidebar
-  const historyList=document.getElementById("historyList");
-  const li=document.createElement("li");
-  li.innerText=(type==="user"?"You: ":"Adam: ")+text.replace(/```/g,"");
-  li.onclick=()=>{document.getElementById("userInput").value=text.replace(/```/g,""); sendChat();}
-  historyList.appendChild(li);
+  /* Top bar */
+  .topbar{position:fixed;top:0;left:0;right:0;height:72px;display:flex;align-items:center;justify-content:space-between;padding:14px 20px;background:linear-gradient(180deg, rgba(0,0,0,0.15), transparent);backdrop-filter: blur(6px);z-index:40}
+  [data-theme="light"] .topbar{background:linear-gradient(180deg, rgba(255,255,255,0.6), transparent);}
+  .brand{display:flex;align-items:center;gap:12px}
+  .logo{width:44px;height:44px;border-radius:10px;background:var(--panel);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:18px;box-shadow:0 6px 18px rgba(0,0,0,0.35)}
+  [data-theme="light"] .logo{box-shadow:0 4px 12px rgba(16,24,40,0.06)}
+  .title{font-size:18px;font-weight:600}
+  .subtitle{font-size:12px;color:var(--muted);margin-top:2px}
+
+  .top-controls{display:flex;align-items:center;gap:12px}
+  .theme-toggle, .history-btn {padding:8px 12px;border-radius:10px;border:none;background:var(--panel);color:inherit;cursor:pointer}
+  .theme-toggle:hover,.history-btn:hover{transform:translateY(-2px)}
+  .search-inline{display:flex;align-items:center;gap:10px;background:var(--panel);padding:8px;border-radius:12px;min-width:420px}
+  .search-inline input{background:transparent;border:none;outline:none;color:inherit;font-size:16px;padding:8px;width:100%}
+  .mic-deco{width:40px;height:40px;border-radius:10px;background:var(--glass);display:flex;align-items:center;justify-content:center;font-size:18px;border:1px solid rgba(255,255,255,0.03)}
+
+  /* layout */
+  .layout{display:flex;height:100vh;padding-top:72px}
+  /* sidebar */
+  .sidebar{width:320px;background:var(--panel);box-shadow:2px 0 40px rgba(0,0,0,0.4);padding:16px;overflow:auto;transform:translateX(-360px);transition:transform .32s;z-index:30;position:fixed;left:0;top:72px;bottom:0}
+  .sidebar.open{transform:translateX(0)}
+  .sidebar h3{margin:0 0 10px 0;font-size:16px}
+  .sidebar .controls{display:flex;gap:8px;margin-bottom:12px}
+  .sidebar .chat-list{display:flex;flex-direction:column;gap:8px}
+  .chat-card{padding:10px;background:var(--bubble);border-radius:10px;cursor:pointer;display:flex;justify-content:space-between;align-items:center}
+  .chat-card .meta{font-size:14px;color:var(--muted)}
+
+  /* main */
+  .main{flex:1;display:flex;flex-direction:column;align-items:center;padding:28px 20px}
+  .pane{width:100%;max-width:920px;background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent);border-radius:14px;padding:18px 18px 120px 18px;box-shadow:0 6px 20px rgba(0,0,0,0.4);overflow:hidden}
+  .messages{height:60vh;overflow:auto;padding:12px;display:flex;flex-direction:column;gap:12px}
+  .msg{max-width:82%;padding:14px;border-radius:12px;background:var(--bubble);line-height:1.45;font-size:16px;white-space:pre-wrap}
+  .msg.user{margin-left:auto;background:var(--user);color:inherit}
+  .msg.ai{margin-right:auto}
+  .msg .meta{font-size:12px;color:var(--muted);margin-bottom:8px}
+  .avatars{display:flex;gap:8px;align-items:center}
+  .avatar{width:36px;height:36px;border-radius:10px;background:var(--panel);display:flex;align-items:center;justify-content:center;font-weight:700}
+
+  /* loading dots (inline) */
+  .loading-dots{display:inline-flex;gap:6px;align-items:center}
+  .loading-dots span{width:8px;height:8px;border-radius:50%;background:var(--accent);opacity:0.25;animation:ld 1s infinite}
+  .loading-dots span:nth-child(2){animation-delay:.15s}
+  .loading-dots span:nth-child(3){animation-delay:.3s}
+  @keyframes ld{0%{opacity:.2;transform:translateY(0)}50%{opacity:1;transform:translateY(-6px)}100%{opacity:.2;transform:translateY(0)}}
+
+  /* code block */
+  pre.code{background:#0b0b0b;border-radius:8px;padding:12px;color:#dbeafe;overflow:auto;font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono", monospace;font-size:14px}
+  .code-controls{display:flex;gap:8px;position:relative;justify-content:flex-end;margin-bottom:8px}
+  .btn{background:var(--panel);border:none;padding:8px 10px;border-radius:8px;cursor:pointer}
+  .btn:hover{transform:translateY(-2px)}
+
+  /* input area */
+  .composer{position:fixed;left:0;right:0;bottom:0;padding:18px 20px;background:linear-gradient(180deg, transparent, rgba(0,0,0,0.3));display:flex;justify-content:center}
+  .composer-inner{width:100%;max-width:920px;display:flex;gap:12px;align-items:center}
+  .left-mic{width:48px;height:48px;border-radius:12px;background:var(--panel);display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,0.03)}
+  .input{flex:1;display:flex;gap:10px;align-items:center;background:var(--panel);padding:10px;border-radius:12px}
+  .input textarea{width:100%;min-height:48px;border:0;background:transparent;color:inherit;resize:none;outline:none;padding:8px;font-size:16px}
+  .send-btn{background:var(--accent);color:white;border:none;padding:10px 14px;border-radius:10px;cursor:pointer;font-weight:600;transition:transform .12s}
+  .send-btn:hover{transform:scale(1.04)}
+
+  /* small screens */
+  @media (max-width:720px){
+    .search-inline{min-width:180px}
+    .sidebar{width:100%;transform:translateY(-100%);position:fixed;left:0;top:72px;height:calc(100% - 72px)}
+    .sidebar.open{transform:translateY(0)}
+    .layout{flex-direction:column}
+    .pane{padding-bottom:180px}
+  }
+</style>
+</head>
+<body data-theme="dark">
+
+  <!-- Topbar -->
+  <div class="topbar">
+    <div class="brand">
+      <div class="logo">A</div>
+      <div>
+        <div class="title">Adam</div>
+        <div class="subtitle">What are you going to make today?</div>
+      </div>
+    </div>
+
+    <div class="top-controls">
+      <div class="search-inline" role="search">
+        <div class="mic-deco" title="Mic (visual only)">🎤</div>
+        <input id="searchInline" placeholder="What are you going to make today?" aria-label="Search / ask">
+      </div>
+
+      <button id="historyToggle" class="history-btn">History</button>
+      <button id="themeToggle" class="theme-toggle">Light</button>
+    </div>
+  </div>
+
+  <div class="layout">
+    <!-- Sidebar -->
+    <aside id="sidebar" class="sidebar" aria-hidden="true">
+      <h3>Saved Conversations</h3>
+      <div class="controls">
+        <button id="newChat" class="btn">New Chat</button>
+        <button id="clearAll" class="btn">Clear All</button>
+      </div>
+      <div id="chatList" class="chat-list" aria-live="polite"></div>
+      <hr style="margin:12px 0;border:none;height:1px;background:rgba(255,255,255,0.03)">
+      <div style="font-size:13px;color:var(--muted)">Tip: Click a saved conversation to reload it into the chat area.</div>
+    </aside>
+
+    <!-- Main -->
+    <main class="main" role="main">
+      <section class="pane" aria-label="Chat pane">
+        <div id="messages" class="messages" aria-live="polite" aria-atomic="false"></div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Composer -->
+  <div class="composer" role="region" aria-label="Composer">
+    <div class="composer-inner">
+      <div class="left-mic" title="Mic (visual only)">🎙</div>
+      <div class="input" role="form">
+        <textarea id="composerInput" placeholder="What are you going to make today?" rows="1"></textarea>
+        <button id="sendBtn" class="send-btn">Send</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+/* -------------------------
+  Utilities & state
+   -------------------------*/
+const MESSAGES = document.getElementById('messages');
+const SIDEBAR = document.getElementById('sidebar');
+const CHATLIST = document.getElementById('chatList');
+const THEMEBTN = document.getElementById('themeToggle');
+const HISTORYBTN = document.getElementById('historyToggle');
+const NEWBTN = document.getElementById('newChat');
+const CLEARBTN = document.getElementById('clearAll');
+const COMPOSER = document.getElementById('composerInput');
+const SENDBTN = document.getElementById('sendBtn');
+const SEARCHINLINE = document.getElementById('searchInline');
+
+let conversations = []; // saved sessions {id,title,items}
+let currentSession = {id: genId(), title: 'New Conversation', items: []};
+
+function genId(){ return 'c-'+Math.random().toString(36).slice(2,9); }
+function now(){ return new Date().toLocaleString(); }
+
+/* localStorage load/save */
+function saveAll(){
+  try{ localStorage.setItem('adam_conversations', JSON.stringify(conversations)); }
+  catch(e){ console.warn('cannot save',e) }
 }
-
-// Send chat
-async function sendChat(){
-  const input=document.getElementById("userInput");
-  const msg=input.value.trim(); if(!msg) return;
-  addMessage(msg,"user");
-  chatHistory.push({type:"user",text:msg});
-  input.value="";
-
+function loadAll(){
   try{
-    const res=await fetch(BACKEND+"/api/chat",{
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({message:msg})
-    });
-    const data=await res.json();
-    let reply=data.reply || "मुझे समझ नहीं आया।";
-    const isCode=reply.includes("```");
-    addMessage(reply,"ai",isCode);
-    chatHistory.push({type:"ai",text:reply});
-  }catch(e){console.error(e);}
+    const raw = localStorage.getItem('adam_conversations');
+    conversations = raw ? JSON.parse(raw) : [];
+  }catch(e){ conversations=[] }
+}
+loadAll();
+
+/* -------------------------
+  UI helpers
+   -------------------------*/
+function openSidebar(){ SIDEBAR.classList.add('open'); SIDEBAR.setAttribute('aria-hidden','false') }
+function closeSidebar(){ SIDEBAR.classList.remove('open'); SIDEBAR.setAttribute('aria-hidden','true') }
+document.getElementById('menuButton')?.addEventListener('click', openSidebar);
+HISTORYBTN.addEventListener('click', ()=>{ if(SIDEBAR.classList.contains('open')) closeSidebar(); else openSidebar(); });
+document.getElementById('closeSidebar').addEventListener('click', closeSidebar);
+
+function renderChatList(){
+  CHATLIST.innerHTML='';
+  if(conversations.length===0){ CHATLIST.innerHTML = '<div style="color:var(--muted);padding:6px">No saved conversations</div>'; return; }
+  conversations.slice().reverse().forEach(conv=>{
+    const el = document.createElement('div');
+    el.className='chat-card';
+    el.innerHTML = `<div>
+        <div style="font-weight:600">${escapeHtml(conv.title)}</div>
+        <div class="meta">${conv.items?.length??0} messages • ${conv.last||''}</div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <button class="btn" data-id="${conv.id}" data-action="load">Load</button>
+        <button class="btn" data-id="${conv.id}" data-action="delete">Del</button>
+      </div>`;
+    CHATLIST.appendChild(el);
+  });
+}
+function saveCurrentSession(title){
+  const snippet = {id: currentSession.id, title: title||currentSession.title, items: currentSession.items.slice(), last: now()};
+  // replace or add
+  const idx = conversations.findIndex(c=>c.id===snippet.id);
+  if(idx>=0) conversations[idx]=snippet; else conversations.push(snippet);
+  saveAll();
+  renderChatList();
 }
 
-// Send button & Enter key
-document.getElementById("sendBtn").onclick=sendChat;
-document.getElementById("userInput").addEventListener("keypress",e=>{if(e.key==="Enter") sendChat();});
-</script>
+/* Chat render */
+function escapeHtml(s){ return String(s).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;'); }
 
+function appendMessage(text, who='ai', opts={}){
+  // opts: {code:boolean}
+  const container = document.createElement('div');
+  container.className = 'msg '+(who==='user'?'user':'ai');
+  if(opts.code){
+    const controls = document.createElement('div'); controls.className='code-controls';
+    const copyBtn = document.createElement('button'); copyBtn.className='btn'; copyBtn.textContent='Copy';
+    const editBtn = document.createElement('button'); editBtn.className='btn'; editBtn.textContent='Edit';
+    controls.appendChild(copyBtn); controls.appendChild(editBtn);
+    container.appendChild(controls);
+
+    const pre = document.createElement('pre'); pre.className='code';
+    pre.innerHTML = escapeHtml(text);
+    container.appendChild(pre);
+
+    copyBtn.onclick = ()=>{ navigator.clipboard.writeText(text).then(()=> flash('Copied')); }
+    editBtn.onclick = ()=>{ COMPOSER.value = text; COMPOSER.focus(); flash('Loaded into composer'); }
+  } else {
+    // show typed text with typing animation
+    const span = document.createElement('div');
+    span.style.whiteSpace = 'pre-wrap';
+    container.appendChild(span);
+
+    // create loading element first then type
+    const loading = document.createElement('div'); loading.className='loading-dots';
+    loading.innerHTML = '<span></span><span></span><span></span>';
+    span.appendChild(loading);
+
+    MESSAGES.appendChild(container); MESSAGES.scrollTop = MESSAGES.scrollHeight;
+
+    // simulate thinking then type
+    setTimeout(()=>{
+      span.removeChild(loading);
+      typeText(span, text, 18); // typing speed (ms)
+    }, 700 + Math.min(800, Math.max(0, text.length*6)));
+  }
+
+  MESSAGES.appendChild(container);
+  MESSAGES.scrollTop = MESSAGES.scrollHeight;
+  // save to session
+  currentSession.items.push({who,text,isCode:!!opts.code,time:now()});
+}
+
+/* Typing animation that preserves spaces and newlines */
+function typeText(el, fullText, speed=20){
+  el.textContent = '';
+  let i=0;
+  const t = setInterval(()=>{
+    el.textContent += fullText.charAt(i) || '';
+    i++;
+    MESSAGES.scrollTop = MESSAGES.scrollHeight;
+    if(i>=fullText.length) clearInterval(t);
+  }, speed);
+}
+
+/* flash small ephemeral message */
+function flash(msg){
+  const f = document.createElement('div');
+  f.textContent = msg;
+  Object.assign(f.style,{position:'fixed',right:'20px',bottom:'140px',background: 'var(--panel)',padding:'10px 14px',borderRadius:'8px',boxShadow:'0 8px 20px rgba(0,0,0,0.5)'});
+  document.body.appendChild(f);
+  setTimeout(()=> f.style.opacity=0,1400); setTimeout(()=>f.remove(),2000);
+}
+
+/* -------------------------
+  Backend simulation / call
+   -------------------------*/
+/* Replace this with your real backend fetch to return { reply: '...' } */
+async function queryBackend(prompt){
+  // simulate various replies including code and line breaks
+  await new Promise(r=>setTimeout(r, 450 + prompt.length*4));
+  // small logic for demo
+  if(/code|function|js|javascript/i.test(prompt)){
+    return {
+      reply: "```javascript\nfunction hello(){\n  console.log('Hello from Adam');\n}\n```"
+    };
+  }
+  if(/hi|hello|kaise/i.test(prompt)){
+    return { reply: "मैं ठीक हूँ, धन्यवाद! आप बताइए किस प्रोजेक्ट पर काम करना चाहते हैं?" };
+  }
+  // generic
+  return { reply: "ये एक डेमो उत्तर है — आप \""+ prompt +"\" के बारे में और पूछ सकते हैं।\n\nअगर आप कोड चाहते हैं तो लिखें: \"write code to ...\"." };
+}
+
+/* -------------------------
+  Actions: send, new, load, delete
+   -------------------------*/
+async function doSend(){
+  const text = COMPOSER.value.trim();
+  if(!text) return;
+  appendMessage(text,'user');
+  COMPOSER.value='';
+  // send to backend
+  // show temporary loading is handled in appendMessage for ai
+  try{
+    const res = await queryBackend(text); // replace with fetch to BACKEND
+    const reply = res.reply || 'मुझे समझ नहीं आया।';
+    // detect code block
+    const hasCode = /```[\s\S]*?```/.test(reply);
+    if(hasCode){
+      // extract code inside ``` ```
+      const codeOnly = reply.replace(/```[\w]*\n?/,'').replace(/```$/,'');
+      appendMessage(codeOnly,'ai',{code:true});
+    } else {
+      appendMessage(reply,'ai',{code:false});
+    }
+    // auto-save session title on first messages
+    if(currentSession.items.length && !currentSession.title) currentSession.title = text.slice(0,40);
+  }catch(e){
+    appendMessage("Error: could not reach backend.", 'ai');
+  }
+}
+
+SENDBTN.addEventListener('click', doSend);
+COMPOSER.addEventListener('keydown', (e)=>{ if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); doSend(); } });
+
+NEWBTN.addEventListener('click', ()=>{
+  currentSession = {id:genId(), title:'New Conversation', items:[]};
+  MESSAGES.innerHTML=''; flash('New chat started');
+});
+
+CLEARBTN.addEventListener('click', ()=>{
+  if(confirm('Delete all saved conversations?')){
+    conversations=[]; saveAll(); renderChatList(); flash('All cleared');
+  }
+});
+
+CHATLIST.addEventListener('click',(e)=>{
+  const btn = e.target.closest('button');
+  if(!btn) return;
+  const id = btn.dataset.id;
+  const action = btn.dataset.action;
+  if(action==='load'){
+    const conv = conversations.find(c=>c.id===id);
+    if(!conv) return;
+    currentSession = {id:conv.id, title:conv.title, items: conv.items.slice()};
+    // render messages
+    MESSAGES.innerHTML='';
+    currentSession.items.forEach(it => {
+      appendMessage(it.text, it.who, {code: !!it.isCode});
+    });
+    closeSidebar();
+  } else if(action==='delete'){
+    if(confirm('Delete this conversation?')){
+      conversations = conversations.filter(c=>c.id!==id);
+      saveAll(); renderChatList(); flash('Deleted');
+    }
+  }
+});
+
+/* Save current to sidebar list */
+document.addEventListener('visibilitychange', ()=>{ if(document.visibilityState==='hidden') saveCurrentSession(currentSession.title) });
+window.addEventListener('beforeunload', ()=>{ saveCurrentSession(currentSession.title); saveAll() });
+
+/* Manual save button when user chooses to save (via context) - here auto-save on demand */
+document.addEventListener('keydown',(e)=>{ if((e.ctrlKey||e.metaKey) && e.key==='s'){ e.preventDefault(); saveCurrentSession(promptTitle()); flash('Saved conversation'); } });
+
+function promptTitle(){
+  const s = prompt('Conversation title', currentSession.title || 'Conversation');
+  if(s) currentSession.title = s;
+  saveCurrentSession(currentSession.title);
+  return currentSession.title;
+}
+
+/* Theme toggle */
+function initTheme(){
+  const stored = localStorage.getItem('adam_theme');
+  const theme = stored || 'dark';
+  document.documentElement.setAttribute('data-theme', theme==='light' ? 'light' : 'dark');
+  THEMEBTN.textContent = theme==='light' ? 'Dark' : 'Light';
+}
+THEMEBTN.addEventListener('click', ()=>{
+  const nowTheme = document.documentElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+  document.documentElement.setAttribute('data-theme', nowTheme);
+  THEMEBTN.textContent = nowTheme === 'light' ? 'Dark' : 'Light';
+  localStorage.setItem('adam_theme', nowTheme);
+});
+
+/* Initial render */
+initTheme();
+renderChatList();
+
+/* Load last conversation if any */
+if(conversations.length>0){
+  const last = conversations[conversations.length-1];
+  currentSession = {id:last.id,title:last.title,items:last.items.slice()};
+  // render
+  currentSession.items.forEach(it=> appendMessage(it.text, it.who, {code: !!it.isCode}));
+}
+
+/* Search inline connects to composer */
+SEARCHINLINE.addEventListener('keydown', (e)=>{
+  if(e.key==='Enter'){ COMPOSER.value = SEARCHINLINE.value; COMPOSER.focus(); }
+});
+
+/* small helper: when messages change, scroll */
+const observer = new MutationObserver(()=>MESSAGES.scrollTop = MESSAGES.scrollHeight);
+observer.observe(MESSAGES,{childList:true, subtree:true});
+
+/* expose some functions for debugging (optional) */
+window._adam = {conversations, saveAll, loadAll, saveCurrentSession, appendMessage};
+
+</script>
 </body>
 </html>
