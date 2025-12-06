@@ -238,7 +238,8 @@ header{
 <div id="assistantBtn" title="Voice Input">🎤</div>
 
 <script>
-const BACKEND = "http://localhost:5000"; // Replace with your API endpoint
+const BACKEND = "https://mr-ai.onrender.com"; // Your live Render backend
+// Replace with your API endpoint
 let chatHistory = JSON.parse(localStorage.getItem("chatHistory") || "[]");
 
 // Sidebar toggle
@@ -378,3 +379,4 @@ document.getElementById("userInput").addEventListener("keypress",e=>{if(e.key===
 </script>
 </body>
 </html>
+
