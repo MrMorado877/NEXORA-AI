@@ -2,195 +2,93 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-  <meta name="google-site-verification" content="qLKwdVfAn0qgmnyOxefdD3EfWTbYMth60QPmLUJcww4" />
-
-<title>NEXORA</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="icon" href="/NEXORA-AI/favicon.png" type="image/png">
-<link rel="shortcut icon" href="/NEXORA-AI/favicon.png" type="image/png">
-<link rel="apple-touch-icon" href="/NEXORA-AI/favicon.png">
-
+<title>Nexora AI</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-
 <style>
-:root{
-  --bg:#000;
-  --glass:rgba(0,0,0,.55);
-  --border:rgba(255,255,255,.15);
-  --text:#fff;
+:root {
+  --bg: #0f0f0f;
+  --glass: rgba(0,0,0,0.55);
+  --text: #fff;
+  --border: rgba(255,255,255,0.15);
 }
-body.light{
-  --bg:#f4f4f4;
-  --glass:rgba(255,255,255,.6);
-  --border:rgba(0,0,0,.15);
-  --text:#000;
-}
+body.light { --bg:#f4f4f4; --glass:rgba(255,255,255,.6); --text:#000; --border:rgba(0,0,0,.15); }
 
-*{margin:0;padding:0;box-sizing:border-box;font-family:system-ui}
-body{
-  height:100vh;
-  background:var(--bg);
-  color:var(--text);
-  overflow:hidden;
-}
-
-/* Toggle Button */
-.toggle-btn{
-  position:fixed;top:20px;left:20px;
-  width:42px;height:42px;border-radius:50%;
-  border:none;cursor:pointer;
-  background:rgba(255,255,255,.15);
-  color:var(--text);font-size:20px;
-  z-index:50;
-}
+*{margin:0;padding:0;box-sizing:border-box;font-family:Inter,system-ui;}
+body{background:var(--bg);color:var(--text);height:100vh;overflow:hidden;}
 
 /* Sidebar */
-.sidebar{
-  position:fixed;left:0;top:0;width:260px;height:100%;
-  background:var(--glass);backdrop-filter:blur(20px);
-  border-right:1px solid var(--border);
-  padding:20px;transition:.3s;z-index:20;
-}
-.sidebar.closed{transform:translateX(-100%)}
-
-.app-name{
-  font-size:28px;font-weight:900;letter-spacing:3px;
-  margin-bottom:20px;
-  background:linear-gradient(90deg,#7f5cff,#00ffd5,#7f5cff);
-  background-size:300% 300%;
-  -webkit-background-clip:text;
-  -webkit-text-fill-color:transparent;
-  animation:grad 6s infinite,glow 2s infinite;
-}
-@keyframes grad{
-  0%{background-position:0%}
-  50%{background-position:100%}
-  100%{background-position:0%}
-}
-@keyframes glow{
-  0%,100%{filter:drop-shadow(0 0 6px #7f5cff)}
-  50%{filter:drop-shadow(0 0 16px #00ffd5)}
-}
-
-.new-chat{
-  width:100%;padding:10px;
-  border-radius:10px;
-  background:transparent;
-  border:1px solid var(--border);
-  color:var(--text);cursor:pointer;
-  margin-bottom:15px;
-}
-
-.chat-title{
-  padding:8px 0;
-  font-size:14px;
-  border-bottom:1px solid var(--border);
-  cursor:pointer;
-  opacity:.8;
-}
+.sidebar{position:fixed;left:0;top:0;width:260px;height:100%;background:var(--glass);backdrop-filter:blur(20px);border-right:1px solid var(--border);padding:20px;transition:.3s;z-index:20;transform:translateX(-100%);}
+.sidebar.open{transform:translateX(0);}
+.app-name{font-size:28px;font-weight:900;letter-spacing:3px;margin-bottom:20px;background:linear-gradient(90deg,#7f5cff,#00ffd5,#7f5cff);background-size:300% 300%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:grad 6s infinite,glow 2s infinite;}
+@keyframes grad{0%{background-position:0%}50%{background-position:100%}100%{background-position:0%}}
+@keyframes glow{0%,100%{filter:drop-shadow(0 0 6px #7f5cff)}50%{filter:drop-shadow(0 0 16px #00ffd5)}}
+.new-chat{width:100%;padding:10px;border-radius:10px;background:transparent;border:1px solid var(--border);color:var(--text);cursor:pointer;margin-bottom:15px;}
+.chat-title{padding:8px 0;font-size:14px;border-bottom:1px solid var(--border);cursor:pointer;opacity:.8;}
 .chat-title:hover{opacity:1}
 
 /* Main */
-.main{
-  margin-left:260px;height:100vh;
-  display:flex;flex-direction:column;
-  align-items:center;transition:.3s;
-}
-.main.full{margin-left:0}
-
-#chatArea{
-  width:70%;max-width:720px;
-  flex:1;overflow-y:auto;padding:20px;
-}
-
-.message{
-  max-width:80%;padding:12px 16px;
-  margin-bottom:12px;border-radius:16px;
-  background:rgba(255,255,255,.1);
-}
-.user{margin-left:auto;border-bottom-right-radius:4px}
-.bot{margin-right:auto;border-bottom-left-radius:4px}
+.main{margin-left:0;height:100vh;display:flex;flex-direction:column;align-items:center;transition:.3s;}
+#chatArea{width:70%;max-width:720px;flex:1;overflow-y:auto;padding:20px;}
+.message{max-width:80%;padding:12px 16px;margin-bottom:12px;border-radius:16px;background:rgba(255,255,255,.1);word-break:break-word;}
+.user{margin-left:auto;border-bottom-right-radius:4px;}
+.bot{margin-right:auto;border-bottom-left-radius:4px;}
+.loader{color:var(--text);opacity:.6;margin-bottom:12px;font-style:italic;}
+.message hr{border:0;border-top:1px solid rgba(255,255,255,.15);margin:10px 0;}
 
 /* Input */
-.search-wrapper{
-  width:70%;max-width:720px;
-  margin-bottom:20px;position:relative;
-}
-.search-bar{
-  width:100%;padding:16px 50px;
-  border-radius:30px;
-  background:var(--glass);
-  border:1px solid var(--border);
-  color:var(--text);font-size:16px;
-}
-.send-btn{
-  position:absolute;right:12px;bottom:10px;
-  width:36px;height:36px;border-radius:50%;
-  border:none;background:rgba(255,255,255,.2);
-  color:var(--text);font-size:18px;
-}
+.search-wrapper{width:70%;max-width:720px;margin-bottom:20px;position:relative;}
+.search-bar{width:100%;padding:16px 50px;border-radius:30px;background:var(--glass);border:1px solid var(--border);color:var(--text);font-size:16px;}
+.send-btn{position:absolute;right:12px;bottom:10px;width:36px;height:36px;border-radius:50%;border:none;background:rgba(255,255,255,.2);color:var(--text);font-size:18px;}
 
-/* Theme Toggle */
-.theme-btn{
-  position:absolute;bottom:20px;left:20px;
-  cursor:pointer;font-size:14px;
-}
+/* Buttons */
+.toggle-btn{position:fixed;top:20px;left:20px;width:42px;height:42px;border-radius:50%;border:none;cursor:pointer;background:rgba(255,255,255,.15);color:var(--text);font-size:20px;z-index:50;}
+.theme-btn{position:absolute;bottom:20px;left:20px;cursor:pointer;font-size:14px;}
 </style>
 </head>
-
 <body>
 
-<button class="toggle-btn" onclick="toggleSidebar()">☰</button>
+<button class="toggle-btn" id="sidebarToggle">☰</button>
 
 <div class="sidebar" id="sidebar">
   <div class="app-name">NEXORA</div>
-  <button class="new-chat" onclick="newChat()">＋ New Chat</button>
+  <button class="new-chat" id="newChatBtn">＋ New Chat</button>
   <div id="chatTitles"></div>
-  <div class="theme-btn" onclick="toggleTheme()">🌙 Toggle Theme</div>
+  <div class="theme-btn" id="themeBtn">🌙 Toggle Theme</div>
 </div>
 
 <div class="main" id="main">
   <div id="chatArea"></div>
   <div class="search-wrapper">
-    <input id="input" class="search-bar" placeholder="Type message…" />
-    <button class="send-btn" onclick="sendMessage()">↑</button>
+    <input id="input" class="search-bar" placeholder="Type message…"/>
+    <button class="send-btn" id="sendBtn">↑</button>
   </div>
 </div>
 
+<!-- Typing Sound -->
+<audio id="typeSound" src="./sounds/type.mp3"></audio>
+
 <script>
-const backend="https://backend-b80q.onrender.com/api/chat";
-const sidebar=document.getElementById("sidebar");
-const main=document.getElementById("main");
-const chatArea=document.getElementById("chatArea");
-const input=document.getElementById("input");
+const backend = "https://backend-b80q.onrender.com/api/chat";
 
-let chats=JSON.parse(localStorage.getItem("nexoraChats")||"[]");
-let currentChat=null;
+const sidebar = document.getElementById("sidebar");
+const chatArea = document.getElementById("chatArea");
+const input = document.getElementById("input");
+const typeSound = document.getElementById("typeSound");
 
-/* Sidebar */
-function toggleSidebar(){
-  sidebar.classList.toggle("closed");
-  main.classList.toggle("full");
-}
+let chats = [];  // do not persist chats on reload
+let currentChat = null;
 
-/* Theme */
-function toggleTheme(){
-  document.body.classList.toggle("light");
-}
+// Sidebar & Theme
+document.getElementById("sidebarToggle").addEventListener("click",()=>{sidebar.classList.toggle("open");});
+document.getElementById("themeBtn").addEventListener("click",()=>{document.body.classList.toggle("light");});
+document.getElementById("newChatBtn").addEventListener("click",()=>{newChat();});
 
-/* Chats */
-function save(){localStorage.setItem("nexoraChats",JSON.stringify(chats));}
-
-function newChat(){
-  currentChat={id:Date.now(),title:"New Chat",messages:[]};
-  chats.unshift(currentChat);
-  save();renderTitles();loadChat(currentChat);
-}
-
+// Save / Load
+function saveChats(){localStorage.setItem("nexoraChats", JSON.stringify(chats));}
 function renderTitles(){
-  const box=document.getElementById("chatTitles");
-  box.innerHTML="";
+  const box=document.getElementById("chatTitles"); box.innerHTML="";
   chats.forEach(c=>{
     const d=document.createElement("div");
     d.className="chat-title";
@@ -199,83 +97,76 @@ function renderTitles(){
     box.appendChild(d);
   });
 }
-
 function loadChat(chat){
-  currentChat=chat;
-  chatArea.innerHTML="";
+  currentChat=chat; chatArea.innerHTML="";
   chat.messages.forEach(m=>addMessage(m.text,m.role,false));
 }
+function newChat(){
+  currentChat={id:Date.now(),title:"New Chat",messages:[]};
+  chats.unshift(currentChat);
+  saveChats(); renderTitles(); loadChat(currentChat);
+}
 
-/* Messages */
-function addMessage(text,role,store=true){
+// Add message with paragraph HR
+function addMessage(text, role, store=true){
   const d=document.createElement("div");
   d.className=`message ${role}`;
-  d.innerHTML=marked.parse(text);
+  const paragraphs = text.split(/\n{2,}/);
+  let html="";
+  paragraphs.forEach((p,i)=>{
+    html+=marked.parse(p);
+    if(i<paragraphs.length-1) html+="<hr>";
+  });
+  d.innerHTML=html;
   chatArea.appendChild(d);
   chatArea.scrollTop=chatArea.scrollHeight;
-
   if(store){
     currentChat.messages.push({role,text});
-    if(currentChat.messages.length===1){
-      currentChat.title=text.slice(0,25);
-      renderTitles();
-    }
-    save();
+    if(currentChat.messages.length===1){currentChat.title=text.slice(0,25); renderTitles();}
+    saveChats();
   }
   return d;
 }
 
+// Typing effect with sound
 function typeEffect(el,text){
-  el.innerHTML="";
-  let i=0,words=text.split(" ");
-  const t=setInterval(()=>{
-    el.innerHTML+=words[i]+" ";
-    chatArea.scrollTop=chatArea.scrollHeight;
-    i++;if(i>=words.length)clearInterval(t);
-  },40);
+  el.innerHTML=""; let i=0; const chars=text.split("");
+  const interval=setInterval(()=>{
+    el.innerHTML+=chars[i]; chatArea.scrollTop=chatArea.scrollHeight;
+    typeSound.currentTime=0; typeSound.play();
+    i++; if(i>=chars.length) clearInterval(interval);
+  },15);
 }
 
-/* Send */
-input.addEventListener("keydown",e=>{if(e.key==="Enter")sendMessage();});
-
+// Send message (non-streaming backend)
 async function sendMessage(){
   if(!currentChat)newChat();
-  const msg=input.value.trim();
-  if(!msg)return;
-  addMessage(msg,"user");
-  input.value="";
+  const msg = input.value.trim(); if(!msg) return;
+  addMessage(msg,"user"); input.value="";
 
-  const botDiv=document.createElement("div");
-  botDiv.className="message bot";
-  chatArea.appendChild(botDiv);
+  const loader=document.createElement("div");
+  loader.className="loader"; loader.textContent="Nexora is thinking...";
+  chatArea.appendChild(loader);
 
-  try{
-    const r=await fetch(backend,{
+  try {
+    const res = await fetch(backend, {
       method:"POST",
       headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({message:msg})
+      body:JSON.stringify({message: msg, history: currentChat.messages})
     });
-    const d=await r.json();
-    typeEffect(botDiv,d.reply);
-    currentChat.messages.push({role:"bot",text:d.reply});
-    save();
-  }catch{
-    botDiv.textContent="Server error";
+    const data = await res.json();
+    loader.remove();
+    typeEffect(addMessage("", "bot"), data.reply); // typing animation
+    currentChat.messages.push({role:"bot", text:data.reply});
+    saveChats();
+  } catch (err) {
+    loader.textContent="Server error";
   }
 }
 
-/* Mobile swipe */
-let startX=0;
-document.addEventListener("touchstart",e=>startX=e.touches[0].clientX);
-document.addEventListener("touchend",e=>{
-  let endX=e.changedTouches[0].clientX;
-  if(endX-startX>80)sidebar.classList.remove("closed"),main.classList.remove("full");
-  if(startX-endX>80)sidebar.classList.add("closed"),main.classList.add("full");
-});
-
-/* Init */
-if(chats.length){loadChat(chats[0]);renderTitles();}
+// Events
+document.getElementById("sendBtn").addEventListener("click",sendMessage);
+input.addEventListener("keydown",e=>{if(e.key==="Enter")sendMessage();});
 </script>
-
 </body>
 </html>
