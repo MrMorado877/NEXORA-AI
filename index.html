@@ -2,177 +2,229 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="google-site-verification" content="qLKwdVfAn0qgmnyOxefdD3EfWTbYMth60QPmLUJcww4" />
-
 <title>Nexora AI</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="icon" href="/NEXORA-AI/favicon.png" type="image/png">
-<link rel="shortcut icon" href="/NEXORA-AI/favicon.png" type="image/png">
-<link rel="apple-touch-icon" href="/NEXORA-AI/favicon.png">
-<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
 <style>
-:root {
-  --bg: #0f0f0f;
-  --glass: rgba(0,0,0,0.55);
-  --text: #fff;
-  --border: rgba(255,255,255,0.15);
+:root{
+  --bg:#0f0f0f;
+  --sidebar:#111;
+  --user:#3b3b3b;
+  --bot:#222;
+  --accent:#6C63FF;
+  --text:#fff;
 }
-body.light { --bg:#f4f4f4; --glass:rgba(255,255,255,.6); --text:#000; --border:rgba(0,0,0,.15); }
+*{box-sizing:border-box;}
+body{
+  margin:0;
+  font-family:Inter,sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  height:100vh;
+  display:flex;
+}
 
-*{margin:0;padding:0;box-sizing:border-box;font-family:Inter,system-ui;}
-body{background:var(--bg);color:var(--text);height:100vh;overflow:hidden;}
+/* SIDEBAR */
+.sidebar{
+  width:240px;
+  background:var(--sidebar);
+  padding:15px;
+  display:flex;
+  flex-direction:column;
+  border-right:1px solid #222;
+}
+.sidebar img{
+  width:60px;height:60px;border-radius:50%;
+  margin:auto;border:2px solid var(--accent);
+}
+.sidebar p{text-align:center;margin:10px 0;font-size:14px;}
+.sidebar button{
+  margin-top:8px;
+  background:var(--accent);
+  border:none;
+  color:#fff;
+  padding:8px;
+  border-radius:8px;
+  cursor:pointer;
+}
+.chat-list{
+  margin-top:15px;
+  flex:1;
+  overflow-y:auto;
+}
+.chat-list button{
+  width:100%;
+  background:#1b1b1b;
+  border:none;
+  color:#fff;
+  padding:8px;
+  margin-bottom:6px;
+  border-radius:6px;
+  text-align:left;
+  cursor:pointer;
+}
 
-/* Sidebar */
-.sidebar{position:fixed;left:0;top:0;width:260px;height:100%;background:var(--glass);backdrop-filter:blur(20px);border-right:1px solid var(--border);padding:20px;transition:.3s;z-index:20;transform:translateX(-100%);}
-.sidebar.open{transform:translateX(0);}
-.app-name{font-size:28px;font-weight:900;letter-spacing:3px;margin-bottom:20px;background:linear-gradient(90deg,#7f5cff,#00ffd5,#7f5cff);background-size:300% 300%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:grad 6s infinite,glow 2s infinite;}
-@keyframes grad{0%{background-position:0%}50%{background-position:100%}100%{background-position:0%}}
-@keyframes glow{0%,100%{filter:drop-shadow(0 0 6px #7f5cff)}50%{filter:drop-shadow(0 0 16px #00ffd5)}}
-.new-chat{width:100%;padding:10px;border-radius:10px;background:transparent;border:1px solid var(--border);color:var(--text);cursor:pointer;margin-bottom:15px;}
-.chat-title{padding:8px 0;font-size:14px;border-bottom:1px solid var(--border);cursor:pointer;opacity:.8;}
-.chat-title:hover{opacity:1}
+/* MAIN */
+.main{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+}
+#chatArea{
+  flex:1;
+  padding:20px;
+  overflow-y:auto;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+.msg{
+  max-width:75%;
+  padding:12px 15px;
+  border-radius:12px;
+  animation:fade 0.3s ease;
+}
+.user{background:var(--user);align-self:flex-end;}
+.bot{background:var(--bot);align-self:flex-start;white-space:pre-line;}
 
-/* Main */
-.main{margin-left:0;height:100vh;display:flex;flex-direction:column;align-items:center;transition:.3s;}
-#chatArea{width:70%;max-width:720px;flex:1;overflow-y:auto;padding:20px;}
-.message{max-width:80%;padding:12px 16px;margin-bottom:12px;border-radius:16px;background:rgba(255,255,255,.1);word-break:break-word;}
-.user{margin-left:auto;border-bottom-right-radius:4px;}
-.bot{margin-right:auto;border-bottom-left-radius:4px;}
-.loader{color:var(--text);opacity:.6;margin-bottom:12px;font-style:italic;}
-.message hr{border:0;border-top:1px solid rgba(255,255,255,.15);margin:10px 0;}
+@keyframes fade{
+  from{opacity:0;transform:translateY(10px);}
+  to{opacity:1;}
+}
 
-/* Input */
-.search-wrapper{width:70%;max-width:720px;margin-bottom:20px;position:relative;}
-.search-bar{width:100%;padding:16px 50px;border-radius:30px;background:var(--glass);border:1px solid var(--border);color:var(--text);font-size:16px;}
-.send-btn{position:absolute;right:12px;bottom:10px;width:36px;height:36px;border-radius:50%;border:none;background:rgba(255,255,255,.2);color:var(--text);font-size:18px;}
+.input-bar{
+  padding:15px;
+  border-top:1px solid #222;
+}
+input{
+  width:100%;
+  padding:15px;
+  border-radius:30px;
+  border:none;
+  background:#1a1a1a;
+  color:white;
+  font-size:16px;
+}
 
-/* Buttons */
-.toggle-btn{position:fixed;top:20px;left:20px;width:42px;height:42px;border-radius:50%;border:none;cursor:pointer;background:rgba(255,255,255,.15);color:var(--text);font-size:20px;z-index:50;}
-.theme-btn{position:absolute;bottom:20px;left:20px;cursor:pointer;font-size:14px;}
+/* MOBILE */
+@media(max-width:700px){
+  body{flex-direction:column;}
+  .sidebar{width:100%;flex-direction:row;align-items:center;gap:10px;}
+  .chat-list{display:flex;overflow-x:auto;}
+  .chat-list button{min-width:150px;}
+}
 </style>
 </head>
+
 <body>
 
-<button class="toggle-btn" id="sidebarToggle">☰</button>
-
-<div class="sidebar" id="sidebar">
-  <div class="app-name">NEXORA</div>
-  <button class="new-chat" id="newChatBtn">＋ New Chat</button>
-  <div id="chatTitles"></div>
-  <div class="theme-btn" id="themeBtn">🌙 Toggle Theme</div>
+<div class="sidebar">
+  <img id="pic">
+  <p id="email"></p>
+  <button onclick="logout()">Logout</button>
+  <div class="chat-list" id="chatList"></div>
 </div>
 
-<div class="main" id="main">
+<div class="main">
   <div id="chatArea"></div>
-  <div class="search-wrapper">
-    <input id="input" class="search-bar" placeholder="Type message…"/>
-    <button class="send-btn" id="sendBtn">↑</button>
+  <div class="input-bar">
+    <input id="input" placeholder="Ask Nexora..." />
   </div>
 </div>
 
-<!-- Typing Sound -->
-<audio id="typeSound" src="./sounds/type.mp3"></audio>
-
 <script>
-const backend = "https://backend-b80q.onrender.com/api/chat";
+const backend="https://backend-b80q.onrender.com";
 
-const sidebar = document.getElementById("sidebar");
-const chatArea = document.getElementById("chatArea");
-const input = document.getElementById("input");
-const typeSound = document.getElementById("typeSound");
+document.getElementById("pic").src=localStorage.getItem("userPic")||"https://via.placeholder.com/60";
+document.getElementById("email").innerText=localStorage.getItem("userEmail");
 
-let chats = [];  // do not persist chats on reload
-let currentChat = null;
+function logout(){
+  localStorage.clear();
+  window.location.href="login.html";
+}
 
-// Sidebar & Theme
-document.getElementById("sidebarToggle").addEventListener("click",()=>{sidebar.classList.toggle("open");});
-document.getElementById("themeBtn").addEventListener("click",()=>{document.body.classList.toggle("light");});
-document.getElementById("newChatBtn").addEventListener("click",()=>{newChat();});
+const input=document.getElementById("input");
+const chatArea=document.getElementById("chatArea");
+const chatList=document.getElementById("chatList");
 
-// Save / Load
-function saveChats(){localStorage.setItem("nexoraChats", JSON.stringify(chats));}
-function renderTitles(){
-  const box=document.getElementById("chatTitles"); box.innerHTML="";
-  chats.forEach(c=>{
-    const d=document.createElement("div");
-    d.className="chat-title";
-    d.textContent=c.title;
-    d.onclick=()=>loadChat(c);
-    box.appendChild(d);
+let currentChat=null;
+
+/* LOAD CHAT TITLES */
+async function loadChats(){
+  const res=await fetch(backend+"/api/chat/titles",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({email:localStorage.getItem("userEmail")})
   });
-}
-function loadChat(chat){
-  currentChat=chat; chatArea.innerHTML="";
-  chat.messages.forEach(m=>addMessage(m.text,m.role,false));
-}
-function newChat(){
-  currentChat={id:Date.now(),title:"New Chat",messages:[]};
-  chats.unshift(currentChat);
-  saveChats(); renderTitles(); loadChat(currentChat);
-}
-
-// Add message with paragraph HR
-function addMessage(text, role, store=true){
-  const d=document.createElement("div");
-  d.className=`message ${role}`;
-  const paragraphs = text.split(/\n{2,}/);
-  let html="";
-  paragraphs.forEach((p,i)=>{
-    html+=marked.parse(p);
-    if(i<paragraphs.length-1) html+="<hr>";
-  });
-  d.innerHTML=html;
-  chatArea.appendChild(d);
-  chatArea.scrollTop=chatArea.scrollHeight;
-  if(store){
-    currentChat.messages.push({role,text});
-    if(currentChat.messages.length===1){currentChat.title=text.slice(0,25); renderTitles();}
-    saveChats();
+  const data=await res.json();
+  chatList.innerHTML="";
+  if(data.titles){
+    data.titles.forEach(c=>{
+      const b=document.createElement("button");
+      b.innerText=c.title;
+      b.onclick=()=>loadChat(c.id);
+      chatList.appendChild(b);
+    });
+    if(data.titles.length>0) loadChat(data.titles[0].id);
   }
-  return d;
 }
 
-// Typing effect with sound
-function typeEffect(el,text){
-  el.innerHTML=""; let i=0; const chars=text.split("");
-  const interval=setInterval(()=>{
-    el.innerHTML+=chars[i]; chatArea.scrollTop=chatArea.scrollHeight;
-    typeSound.currentTime=0; typeSound.play();
-    i++; if(i>=chars.length) clearInterval(interval);
-  },15);
+/* LOAD CHAT HISTORY */
+async function loadChat(id){
+  currentChat=id;
+  const res=await fetch(backend+"/api/chat/history",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({chatId:id})
+  });
+  const data=await res.json();
+  chatArea.innerHTML="";
+  data.history.forEach(m=>{
+    const div=document.createElement("div");
+    div.className="msg "+(m.sender==="user"?"user":"bot");
+    div.innerText=m.content;
+    chatArea.appendChild(div);
+  });
+  chatArea.scrollTop=chatArea.scrollHeight;
 }
 
-// Send message (non-streaming backend)
-async function sendMessage(){
-  if(!currentChat)newChat();
-  const msg = input.value.trim(); if(!msg) return;
-  addMessage(msg,"user"); input.value="";
+/* SEND MESSAGE */
+input.addEventListener("keydown",async e=>{
+  if(e.key==="Enter"){
+    const msg=input.value.trim();
+    if(!msg) return;
+    input.value="";
 
-  const loader=document.createElement("div");
-  loader.className="loader"; loader.textContent="Nexora is thinking...";
-  chatArea.appendChild(loader);
+    const u=document.createElement("div");
+    u.className="msg user";
+    u.innerText=msg;
+    chatArea.appendChild(u);
 
-  try {
-    const res = await fetch(backend, {
+    const b=document.createElement("div");
+    b.className="msg bot";
+    b.innerText="Typing...";
+    chatArea.appendChild(b);
+
+    const res=await fetch(backend+"/api/chat",{
       method:"POST",
       headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({message: msg, history: currentChat.messages})
+      body:JSON.stringify({
+        email:localStorage.getItem("userEmail"),
+        message:msg,
+        language:"English"
+      })
     });
-    const data = await res.json();
-    loader.remove();
-    typeEffect(addMessage("", "bot"), data.reply); // typing animation
-    currentChat.messages.push({role:"bot", text:data.reply});
-    saveChats();
-  } catch (err) {
-    loader.textContent="Server error";
-  }
-}
 
-// Events
-document.getElementById("sendBtn").addEventListener("click",sendMessage);
-input.addEventListener("keydown",e=>{if(e.key==="Enter")sendMessage();});
+    const data=await res.json();
+    b.innerText=data.reply;
+    chatArea.scrollTop=chatArea.scrollHeight;
+    loadChats();
+  }
+});
+
+loadChats();
 </script>
+
 </body>
 </html>
-
