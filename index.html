@@ -2,229 +2,149 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Nexora AI</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nexora AI</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-
 <style>
 :root{
-  --bg:#0f0f0f;
-  --sidebar:#111;
-  --user:#3b3b3b;
-  --bot:#222;
-  --accent:#6C63FF;
-  --text:#fff;
+  --bg:#0f0f0f; --glass:rgba(0,0,0,0.55); --text:#fff; --accent:#6C63FF;
+  --border:rgba(255,255,255,0.2); --input-bg:#1a1a1a; --bot-bg:#252525;
+  --user-bg:#3b3b3b; --sidebar-bg:#111;
 }
-*{box-sizing:border-box;}
-body{
-  margin:0;
-  font-family:Inter,sans-serif;
-  background:var(--bg);
-  color:var(--text);
-  height:100vh;
-  display:flex;
-}
-
-/* SIDEBAR */
-.sidebar{
-  width:240px;
-  background:var(--sidebar);
-  padding:15px;
-  display:flex;
-  flex-direction:column;
-  border-right:1px solid #222;
-}
-.sidebar img{
-  width:60px;height:60px;border-radius:50%;
-  margin:auto;border:2px solid var(--accent);
-}
-.sidebar p{text-align:center;margin:10px 0;font-size:14px;}
-.sidebar button{
-  margin-top:8px;
-  background:var(--accent);
-  border:none;
-  color:#fff;
-  padding:8px;
-  border-radius:8px;
-  cursor:pointer;
-}
-.chat-list{
-  margin-top:15px;
-  flex:1;
-  overflow-y:auto;
-}
-.chat-list button{
-  width:100%;
-  background:#1b1b1b;
-  border:none;
-  color:#fff;
-  padding:8px;
-  margin-bottom:6px;
-  border-radius:6px;
-  text-align:left;
-  cursor:pointer;
-}
-
-/* MAIN */
-.main{
-  flex:1;
-  display:flex;
-  flex-direction:column;
-}
-#chatArea{
-  flex:1;
-  padding:20px;
-  overflow-y:auto;
-  display:flex;
-  flex-direction:column;
-  gap:10px;
-}
-.msg{
-  max-width:75%;
-  padding:12px 15px;
-  border-radius:12px;
-  animation:fade 0.3s ease;
-}
-.user{background:var(--user);align-self:flex-end;}
-.bot{background:var(--bot);align-self:flex-start;white-space:pre-line;}
-
-@keyframes fade{
-  from{opacity:0;transform:translateY(10px);}
-  to{opacity:1;}
-}
-
-.input-bar{
-  padding:15px;
-  border-top:1px solid #222;
-}
-input{
-  width:100%;
-  padding:15px;
-  border-radius:30px;
-  border:none;
-  background:#1a1a1a;
-  color:white;
-  font-size:16px;
-}
-
-/* MOBILE */
-@media(max-width:700px){
-  body{flex-direction:column;}
-  .sidebar{width:100%;flex-direction:row;align-items:center;gap:10px;}
-  .chat-list{display:flex;overflow-x:auto;}
-  .chat-list button{min-width:150px;}
-}
+body{margin:0;font-family:'Inter',sans-serif;display:flex;height:100vh;overflow:hidden;background:var(--bg);color:var(--text);}
+.sidebar{width:220px;background:var(--sidebar-bg);display:flex;flex-direction:column;align-items:center;padding:20px;border-right:1px solid var(--border);transition:width 0.3s;}
+.sidebar.collapsed{width:60px;}
+.sidebar img{width:60px;height:60px;border-radius:50%;border:2px solid var(--accent);margin-bottom:10px;transition:opacity 0.3s;}
+.sidebar.collapsed img{opacity:0;}
+.sidebar p{font-size:14px;text-align:center;margin:0;transition:opacity 0.3s;}
+.sidebar.collapsed p{opacity:0;}
+.sidebar button{background:var(--accent);border:none;color:#fff;padding:10px;width:100%;margin-top:8px;border-radius:8px;cursor:pointer;transition:0.2s,opacity 0.3s;}
+.sidebar.collapsed button{width:50px;padding:10px 0;font-size:0;opacity:0.7;}
+.sidebar button:hover{background:#574bff;}
+#collapseBtn{margin-top:20px;background:var(--accent);border-radius:50%;width:35px;height:35px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:bold;transition:transform 0.3s;}
+#collapseBtn:hover{background:#574bff;}
+.sidebar.collapsed #collapseBtn{transform:rotate(180deg);}
+.chat-titles{width:100%;margin-top:20px;display:flex;flex-direction:column;gap:8px;overflow-y:auto;max-height:300px;}
+.chat-titles button{background:#1a1a1a;border:none;color:#fff;padding:8px;text-align:left;border-radius:6px;cursor:pointer;transition:0.2s;}
+.chat-titles button:hover{background:#333;}
+.main{flex:1;display:flex;flex-direction:column;position:relative;}
+#chatArea{flex:1;padding:20px;overflow-y:auto;display:flex;flex-direction:column;gap:12px;}
+.message-box{padding:12px 18px;border-radius:12px;max-width:70%;word-wrap:break-word;animation:fadeIn 0.3s;}
+.user-msg{background:var(--user-bg);align-self:flex-end;}
+.bot-msg{background:var(--bot-bg);align-self:flex-start;position:relative;}
+.search-wrapper{position:sticky;bottom:0;background:var(--bg);padding:15px 20px;display:flex;justify-content:center;border-top:1px solid var(--border);}
+.search-bar{width:80%;padding:15px 20px;border-radius:30px;background:var(--input-bg);color:var(--text);border:1px solid var(--border);outline:none;font-size:16px;}
+.search-bar:focus{border:1px solid var(--accent);box-shadow:0 0 10px var(--accent);}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
 </style>
 </head>
-
 <body>
-
-<div class="sidebar">
-  <img id="pic">
-  <p id="email"></p>
+<div class="sidebar" id="sidebar">
+  <img id="profilePic" src="" alt="Profile">
+  <p id="userEmail">User Email</p>
   <button onclick="logout()">Logout</button>
-  <div class="chat-list" id="chatList"></div>
+  <div class="chat-titles" id="chatTitles"></div>
+  <div id="collapseBtn" onclick="toggleSidebar()">⮜</div>
 </div>
-
 <div class="main">
   <div id="chatArea"></div>
-  <div class="input-bar">
-    <input id="input" placeholder="Ask Nexora..." />
+  <div class="search-wrapper">
+    <input id="input" class="search-bar" placeholder="Ask Nexora...">
   </div>
 </div>
 
 <script>
-const backend="https://backend-b80q.onrender.com";
+const backend = "https://backend-b80q.onrender.com/api/chat";
 
-document.getElementById("pic").src=localStorage.getItem("userPic")||"https://via.placeholder.com/60";
-document.getElementById("email").innerText=localStorage.getItem("userEmail");
+const input = document.getElementById("input");
+const chatArea = document.getElementById("chatArea");
+const chatTitles = document.getElementById("chatTitles");
+const sidebar = document.getElementById("sidebar");
 
-function logout(){
-  localStorage.clear();
-  window.location.href="login.html";
-}
+document.getElementById("profilePic").src = localStorage.getItem("userPic") || "https://via.placeholder.com/60";
+document.getElementById("userEmail").innerText = localStorage.getItem("userEmail") || "user@example.com";
 
-const input=document.getElementById("input");
-const chatArea=document.getElementById("chatArea");
-const chatList=document.getElementById("chatList");
+function toggleSidebar(){sidebar.classList.toggle("collapsed");}
+function logout(){localStorage.clear(); window.location.href="login.html";}
 
-let currentChat=null;
-
-/* LOAD CHAT TITLES */
-async function loadChats(){
-  const res=await fetch(backend+"/api/chat/titles",{
-    method:"POST",
-    headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({email:localStorage.getItem("userEmail")})
-  });
-  const data=await res.json();
-  chatList.innerHTML="";
-  if(data.titles){
-    data.titles.forEach(c=>{
-      const b=document.createElement("button");
-      b.innerText=c.title;
-      b.onclick=()=>loadChat(c.id);
-      chatList.appendChild(b);
+// Load chat titles
+async function loadChatTitles(){
+  try{
+    const res = await fetch(backend + "/titles",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({email:localStorage.getItem("userEmail")})
     });
-    if(data.titles.length>0) loadChat(data.titles[0].id);
-  }
+    const data = await res.json();
+    chatTitles.innerHTML="";
+    if(data.titles){
+      data.titles.forEach(t=>{
+        const btn=document.createElement("button");
+        btn.innerText=t.title;
+        btn.onclick=()=>loadChatHistory(t.id);
+        chatTitles.appendChild(btn);
+      });
+    }
+  }catch(e){console.error(e);}
 }
 
-/* LOAD CHAT HISTORY */
-async function loadChat(id){
-  currentChat=id;
-  const res=await fetch(backend+"/api/chat/history",{
-    method:"POST",
-    headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({chatId:id})
-  });
-  const data=await res.json();
-  chatArea.innerHTML="";
-  data.history.forEach(m=>{
-    const div=document.createElement("div");
-    div.className="msg "+(m.sender==="user"?"user":"bot");
-    div.innerText=m.content;
-    chatArea.appendChild(div);
-  });
-  chatArea.scrollTop=chatArea.scrollHeight;
+// Load chat history
+async function loadChatHistory(chatId){
+  try{
+    const res = await fetch(backend + "/history",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({chatId})
+    });
+    const data = await res.json();
+    chatArea.innerHTML="";
+    data.history.forEach(msg=>{
+      const div=document.createElement("div");
+      div.className="message-box "+(msg.sender==="user"?"user-msg":"bot-msg");
+      div.innerText=msg.content;
+      chatArea.appendChild(div);
+    });
+    chatArea.scrollTop = chatArea.scrollHeight;
+  }catch(e){console.error(e);}
 }
 
-/* SEND MESSAGE */
-input.addEventListener("keydown",async e=>{
+// Send message
+input.addEventListener("keypress", async (e)=>{
   if(e.key==="Enter"){
     const msg=input.value.trim();
     if(!msg) return;
     input.value="";
+    const userMsg=document.createElement("div");
+    userMsg.className="message-box user-msg";
+    userMsg.innerText=msg;
+    chatArea.appendChild(userMsg);
 
-    const u=document.createElement("div");
-    u.className="msg user";
-    u.innerText=msg;
-    chatArea.appendChild(u);
+    const botMsg=document.createElement("div");
+    botMsg.className="message-box bot-msg";
+    botMsg.innerText="Typing...";
+    chatArea.appendChild(botMsg);
+    chatArea.scrollTop = chatArea.scrollHeight;
 
-    const b=document.createElement("div");
-    b.className="msg bot";
-    b.innerText="Typing...";
-    chatArea.appendChild(b);
-
-    const res=await fetch(backend+"/api/chat",{
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({
-        email:localStorage.getItem("userEmail"),
-        message:msg,
-        language:"English"
-      })
-    });
-
-    const data=await res.json();
-    b.innerText=data.reply;
-    chatArea.scrollTop=chatArea.scrollHeight;
-    loadChats();
+    try{
+      const res = await fetch(backend,{
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({
+          message:msg,
+          language:localStorage.getItem("lang"),
+          email:localStorage.getItem("userEmail")
+        })
+      });
+      const data = await res.json();
+      botMsg.innerText=data.reply;
+      chatArea.scrollTop = chatArea.scrollHeight;
+      loadChatTitles();
+    }catch(e){botMsg.innerText="Server error!";console.error(e);}
   }
 });
 
-loadChats();
+// Initial load
+loadChatTitles();
 </script>
-
 </body>
 </html>
